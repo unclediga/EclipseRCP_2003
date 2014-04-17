@@ -10,32 +10,21 @@ import org.eclipse.jdt.core.IType;
 import org.osgi.framework.BundleContext;
 
 public class JUnitPlugin extends Plugin {
-	
 	private static JUnitPlugin instance;
 	
 	private ArrayList listeners = new ArrayList();
 
-	public JUnitPlugin(){
-		
+	public JUnitPlugin(IPluginDescriptor descriptor) {
+		super(descriptor);
+		instance = this;
+		System.out
+				.println("MY:" + this.getClass().getName() + ".Constructor()");
 	}
 
 	public static JUnitPlugin getPlugin() {
 		return instance;
 	}
-	
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		instance = this;
-	}
 
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		instance = null;
-		super.stop(context);
-	}
-
-	////////////////////////////////////////////////////////////
 	public void run(IType type) {
 		new TestRunner().run(type);
 	}
