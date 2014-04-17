@@ -13,6 +13,11 @@ public class JUnitPlugin extends Plugin {
 	private static JUnitPlugin instance;
 	
 	private ArrayList listeners = new ArrayList();
+	
+	public JUnitPlugin(){
+		
+	}
+	
 
 	public JUnitPlugin(IPluginDescriptor descriptor) {
 		super(descriptor);
