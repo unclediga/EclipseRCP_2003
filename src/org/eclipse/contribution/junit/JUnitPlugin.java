@@ -15,7 +15,7 @@ public class JUnitPlugin extends Plugin {
 	private ArrayList listeners = new ArrayList();
 	
 	public JUnitPlugin(){
-		
+		instance = this;
 	}
 	
 
