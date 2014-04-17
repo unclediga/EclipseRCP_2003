@@ -4,12 +4,15 @@
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
+            adaptable="false"
             id="org.eclipse.contribution.junit.runtest"
             objectClass="org.eclipse.jdt.core.IType">
-            <action
-                  id="org.eclipse.contribution.junit.runtest.action"
-                  label="Run Test">
-            </action>
+         <action
+               class="org.eclipse.contribution.junit.RunTestAction"
+               enablesFor="1"
+               id="org.eclipse.contribution.junit.runtest.action"
+               label="Run Test">
+         </action>
       </objectContribution>
    </extension>
 </plugin>
