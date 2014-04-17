@@ -1,19 +1,18 @@
 package org.eclipse.contribution.junit;
 
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-
-import org.eclipse.jdt.core.IType;
 
 public class RunTestAction implements IObjectActionDelegate {
 
 	private ISelection selection;
 
 	public RunTestAction() {
-		// TODO Auto-generated constructor stub
 		System.out
 				.println("MY:" + this.getClass().getName() + ".Constructor()");
 	}
@@ -24,7 +23,11 @@ public class RunTestAction implements IObjectActionDelegate {
 			return;
 		IStructuredSelection structured = (IStructuredSelection) selection;
 		IType type = (IType) structured.getFirstElement();
-		System.out.println("MY:" + this.getClass().getName() + ".run()");
+		ITestRunListener listener = new Listener();
+		JUnitPlugin.getPlugin().addTestListener(listener);
+		JUnitPlugin.getPlugin().run(type);
+		JUnitPlugin.getPlugin().removeTestListener(listener);
+
 	}
 
 	@Override
@@ -36,7 +39,26 @@ public class RunTestAction implements IObjectActionDelegate {
 
 	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		// TODO Auto-generated method stub
+	}
+
+	// //////////////////////////////////////////////////////////////
+	public static class Listener implements ITestRunListener {
+		private boolean passed = true;
+
+		public void testsStarted(int testCount) {
+		}
+
+		public void testsFinished() {
+			String message = passed ? "Pass" : "Fail";
+			MessageDialog.openInformation(null, "Test Results", message);
+		}
+
+		public void testStarted(String klass, String method) {
+		}
+
+		public void testFailed(String klass, String method, String trace) {
+			passed = false;
+		}
 	}
 
 }

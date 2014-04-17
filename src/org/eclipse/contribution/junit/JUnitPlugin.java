@@ -1,5 +1,8 @@
 package org.eclipse.contribution.junit;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPluginDescriptor;
 import org.eclipse.core.runtime.Plugin;
@@ -8,47 +11,61 @@ import org.osgi.framework.BundleContext;
 
 public class JUnitPlugin extends Plugin {
 	private static JUnitPlugin instance;
+	private ArrayList listeners = new ArrayList();
 
-	public JUnitPlugin(IPluginDescriptor descriptor){
+	public JUnitPlugin(IPluginDescriptor descriptor) {
 		super(descriptor);
 		instance = this;
-		System.out.println("MY:"+this.getClass().getName()+".Constructor()");	
+		System.out
+				.println("MY:" + this.getClass().getName() + ".Constructor()");
 	}
-	
-	public JUnitPlugin getPlugin() {
+
+	public static JUnitPlugin getPlugin() {
 		return instance;
 	}
-	
+
 	public void run(IType type) {
-		// TODO 
-		System.out.println("MY:"+this.getClass().getName()+".run()");	
+		new TestRunner().run(type);
 	}
 
-	@Override
-	public void shutdown() throws CoreException {
-		// TODO Auto-generated method stub
-		System.out.println("MY:"+this.getClass().getName()+".shutdown()");	
-		super.shutdown();
+	public void addTestListener(ITestRunListener listener) {
+		listeners.add(listener);
 	}
 
-	@Override
-	public void start(BundleContext context) throws Exception {
-		// TODO Auto-generated method stub
-		System.out.println("MY:"+this.getClass().getName()+".start()");	
-		super.start(context);
+	public void removeTestListener(ITestRunListener listener) {
+		listeners.remove(listener);
 	}
 
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		// TODO Auto-generated method stub
-		System.out.println("MY:"+this.getClass().getName()+".stOP()");	
-		super.stop(context);
+	public void fireTestsStarted(int count) {
+		for (Iterator all = getListeners().iterator(); all.hasNext();) {
+			ITestRunListener each = (ITestRunListener) all.next();
+			each.testsStarted(count);
+		}
 	}
 
-	@Override
-	public void startup() throws CoreException {
-		// TODO Auto-generated method stub
-		System.out.println("MY:"+this.getClass().getName()+".startup()");	
-		super.startup();
+	public void fireTestsFinished() {
+		for (Iterator all = getListeners().iterator(); all.hasNext();) {
+			ITestRunListener each = (ITestRunListener) all.next();
+			each.testsFinished();
+		}
 	}
+
+	private ArrayList getListeners() {
+		return listeners;
+	}
+
+	public void fireTestStarted(String klass, String methodName) {
+		for (Iterator all = getListeners().iterator(); all.hasNext();) {
+			ITestRunListener each = (ITestRunListener) all.next();
+			each.testStarted(klass, methodName);
+		}
+	}
+
+	public void fireTestFailed(String klass, String method, String trace) {
+		for (Iterator all = getListeners().iterator(); all.hasNext();) {
+			ITestRunListener each = (ITestRunListener) all.next();
+			each.testFailed(klass, method, trace);
+		}
+	}
+
 }
