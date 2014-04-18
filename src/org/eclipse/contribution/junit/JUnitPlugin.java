@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IPluginDescriptor;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.jdt.core.IType;
@@ -55,20 +55,76 @@ public class JUnitPlugin extends Plugin {
 		listeners.remove(listener);
 	}
 
-	public void fireTestsStarted(int count) {
+	public void fireTestsStarted(final int testCount) {
 		for (Iterator all = getListeners().iterator(); all.hasNext();) {
-			ITestRunListener each = (ITestRunListener) all.next();
-			each.testsStarted(count);
+			final ITestRunListener each = (ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable() {
+				public void handleException(Throwable exception) {
+				}
+
+				public void run() throws Exception {
+					each.testsStarted(testCount);
+				}
+			};
+			Platform.run(runnable);
 		}
 	}
 
 	public void fireTestsFinished() {
 		for (Iterator all = getListeners().iterator(); all.hasNext();) {
-			ITestRunListener each = (ITestRunListener) all.next();
-			each.testsFinished();
+			final ITestRunListener each = (ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable() {
+				@Override
+				public void handleException(Throwable exception) {
+				}
+				@Override
+				public void run() throws Exception {
+					each.testsFinished();
+				}
+			};
+			Platform.run(runnable);
+			
 		}
 	}
 
+	public void fireTestStarted(final String klass, final String methodName) {
+		for (Iterator all = getListeners().iterator(); all.hasNext();) {
+			final ITestRunListener each = (ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable() {
+
+				@Override
+				public void handleException(Throwable exception) {
+				}
+
+				@Override
+				public void run() throws Exception {
+					each.testStarted(klass, methodName);
+				}
+			};
+			Platform.run(runnable);
+
+		}
+	}
+	
+	public void fireTestFailed(final String klass, final String method, final String trace) {
+		for (Iterator all = getListeners().iterator(); all.hasNext();) {
+			final ITestRunListener each = (ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable() {
+
+				@Override
+				public void handleException(Throwable exception) {
+				}
+
+				@Override
+				public void run() throws Exception {
+					each.testFailed(klass, method, trace);
+				}
+				
+			};
+			Platform.run(runnable);
+		}
+	}
+	
 	private List getListeners() {
 		if(listeners == null){
 			listeners =  computeListeners(); 
@@ -97,18 +153,5 @@ public class JUnitPlugin extends Plugin {
 		return result;
 	}
 
-	public void fireTestStarted(String klass, String methodName) {
-		for (Iterator all = getListeners().iterator(); all.hasNext();) {
-			ITestRunListener each = (ITestRunListener) all.next();
-			each.testStarted(klass, methodName);
-		}
-	}
-
-	public void fireTestFailed(String klass, String method, String trace) {
-		for (Iterator all = getListeners().iterator(); all.hasNext();) {
-			ITestRunListener each = (ITestRunListener) all.next();
-			each.testFailed(klass, method, trace);
-		}
-	}
 
 }
