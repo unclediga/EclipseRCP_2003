@@ -48,11 +48,11 @@ public class JUnitPlugin extends Plugin {
 	}
 
 	public void addTestListener(ITestRunListener listener) {
-		listeners.add(listener);
+		getListeners().add(listener);
 	}
 
 	public void removeTestListener(ITestRunListener listener) {
-		listeners.remove(listener);
+		getListeners().remove(listener);
 	}
 
 	public void fireTestsStarted(final int testCount) {
